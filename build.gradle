@@ -1,0 +1,87 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        jcenter()
+        gradlePluginPortal()
+        maven {
+            url "https://jitpack.io"
+        }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        // to read credential local file
+        def gradlecredentials = "credentials.gradle"
+        if (project.file(gradlecredentials).exists()){
+            apply from: gradlecredentials
+        }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.0.2'
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.1.1"
+        classpath "com.hiya:jacoco-android:0.2"
+    }
+}
+
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        jcenter()
+        maven { url "https://jitpack.io" }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        // BFR SDK url
+        maven {
+            url "https://bluefrogrobotics.jfrog.io/artifactory/bluefrogrobotics-libs-release-local/"
+            credentials{
+                username "${maven_user}"
+                password "${maven_password}"
+            }
+        }
+    }
+}
+apply plugin:"java"
+apply plugin: "org.sonarqube"
+//apply plugin: "com.hiya.jacoco-android"
+//apply plugin: "com.hiya.jacoco-android"
+apply plugin: 'jacoco'
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+test.finalizedBy jacocoTestReport //to ensure that the test report is always generated after tests are run
+sonarqube {
+    properties{
+        property 'sonar.host.url', 'https:localhost:9000'
+        property "sonar.login", "sqp_12f76145c339af1c6d8dc4b093bfd3172c6f1da6"
+        property "sonar.password", "Odasi@tiger_2023"
+        property "sonar.projectKey", "net.ptidej.buddytherobot"
+       // property "sonar.projectName", "net.ptidej.buddytherobot"
+       // property "sonar.sources", ["src/test", "src/main/java"]
+        //property "sonar.tests", "src/test"
+        property "sonar.sourceEncoding", "UTF-8"
+        //property "sonar.test.inclusions", ["src/test/java"]
+        //property "sonar.java.source", 17
+       //property 'sonar.junit.reportPaths', 'build/results'
+        //property 'encoding', 'UTF-8'
+        property 'charSet', 'UTF-8'
+       // def unit = fileTree(dir: project.projectDir, includes: ['**/*.exec']).files;
+       // def ui = fileTree(dir: project.projectDir, includes: ['**/*.ec']).files;
+       // unit.addAll(ui);
+       // def files = unit.join(", ");
+
+       // property "sonar.jacoco.reportPaths", files
+        property "sonar.java.coveragePlugin", "jacoco"
+       // property "sonar.junit.reportsPath", "build/test-results/testDebugUnitTest"
+        //property "sonar.android.lint.report", "build/reports/lint-results.xml"
+         property "sonar.coverage.jacoco.xmlReportPaths", "target/site/jacoco-aggregate/jacoco.xml"
+    }
+}
+/*task clean(type: Delete) {
+    delete rootProject.buildDir
+}*/
